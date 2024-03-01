@@ -25,6 +25,7 @@ export class UserListComponent implements OnInit {
     pageDetails = { size: 3, pageNumber: 1, max: 1 };
     users: Array<User> = [];
     totalItems = 0;
+    searchParams: { [key: string]: string } = {};
 
     constructor(private service: UsersService, private toaster: ToastrService, private route: ActivatedRoute, private router: Router) {}
 
@@ -34,29 +35,50 @@ export class UserListComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.route.queryParams.pipe(skip(1)).subscribe(
-            (data) => {
-                if (data.hasOwnProperty("page")) {
-                    this.pageDetails.pageNumber = UserListComponent.checkItemIsDigit(data["page"], 1);
-                    this.fetchUsers({});
-                }
-
-                if (data.hasOwnProperty("size")) {
-                    this.pageDetails.size = UserListComponent.checkItemIsDigit(data["size"], 3);
-                    this.pageDetails.max = Math.ceil(this.pageDetails.size / this.pageDetails.pageNumber);
-                    this.fetchUsers({});
-                }
-            }
-        );
-
+        // initial page load
         const queryParams = this.route.snapshot.queryParams;
+        if (queryParams.hasOwnProperty('search')) {
+            this.searchParams = this.generateSearchParams(queryParams['search']);
+        }
         this.pageDetails = {
             max: 1,
             size: UserListComponent.checkItemIsDigit(queryParams['size'], 3),
             pageNumber: UserListComponent.checkItemIsDigit(queryParams['page'], 1)
         };
         this.pageDetails.max = Math.ceil(this.pageDetails.size / this.pageDetails.pageNumber);
-        this.fetchUsers({});
+        this.fetchUsers(this.searchParams);
+
+        this.route.queryParams.pipe(skip(1)).subscribe(
+            (data) => {
+                // subsequent query params
+                if (data.hasOwnProperty("search")) {
+                    this.searchParams = this.generateSearchParams(data["search"]);
+                } else {
+                    this.searchParams = {};
+                }
+
+                if (data.hasOwnProperty("page")) {
+                    this.pageDetails.pageNumber = UserListComponent.checkItemIsDigit(data["page"], 1);
+                }
+
+                if (data.hasOwnProperty("size")) {
+                    this.pageDetails.size = UserListComponent.checkItemIsDigit(data["size"], 3);
+                    this.pageDetails.max = Math.ceil(this.pageDetails.size / this.pageDetails.pageNumber);
+                }
+                this.fetchUsers(this.searchParams);
+            }
+        );
+    }
+
+    generateSearchParams(item: string): { [key: string]: string } {
+        if (item) {
+            if (item.search(/@/g) > -1) {
+                return { email: item }
+            } else {
+                return { name: item }
+            }
+        }
+        return {};
     }
 
     fetchUsers(filter:  { [key: string]: string; }) {
