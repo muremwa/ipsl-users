@@ -4,7 +4,34 @@
 @import 'bootstrap/scss/bootstrap';
 
 html {
+    font-size: 15px;
+
     * {
         font-family: 'IBM Plex Sans', sans-serif;
+    }
+}
+
+.loader-container {
+    width: 10%;
+    margin: auto;
+}
+
+.loader {
+    width: 3em;
+    height: 3em;
+    border: 5px solid #2d498d;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
     }
 }

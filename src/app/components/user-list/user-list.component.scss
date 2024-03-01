@@ -1,0 +1,13 @@
+.user-avatar {
+    width: 4em;
+    height: 4em;
+}
+
+.users-table {
+    & > tbody {
+        tr {
+            height: 4em;
+            line-height: 4em;
+        }
+    }
+}
