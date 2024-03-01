@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef } from '@angular/core';
 import { UsersService } from "../../services/users.service";
 import { User } from "../../services/users.model";
 import { environment } from "../../../environments/environment";
@@ -7,6 +7,7 @@ import { ToastrService } from "ngx-toastr";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { FormsModule } from "@angular/forms";
 import { skip } from "rxjs";
+import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
     selector: 'app-user-list',
@@ -26,8 +27,9 @@ export class UserListComponent implements OnInit {
     users: Array<User> = [];
     totalItems = 0;
     searchParams: { [key: string]: string } = {};
+    modalRef: NgbModalRef;
 
-    constructor(private service: UsersService, private toaster: ToastrService, private route: ActivatedRoute, private router: Router) {}
+    constructor(private service: UsersService, private toaster: ToastrService, private route: ActivatedRoute, private router: Router, private modalService: NgbModal) {}
 
     static checkItemIsDigit(item: string, fallback: number): number {
         const convertedItem = parseInt(item);
@@ -111,5 +113,9 @@ export class UserListComponent implements OnInit {
             queryParams: { page: 1, size: this.pageDetails.size },
             queryParamsHandling: 'merge'
         }).then((_) => void 0);
+    }
+
+    openModal(ref: TemplateRef<void>) {
+        this.modalRef = this.modalService.open(ref, { size: "xl" });
     }
 }
