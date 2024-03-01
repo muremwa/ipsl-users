@@ -40,5 +40,41 @@
                 </tbody>
             </table>
         </div>
+
+        @if (users.length > 0) {
+            <div class="row">
+                <div class="col-2"></div>
+
+                <ul class="pagination col-6">
+                    <li class="page-item" [class.disabled]="pageDetails.pageNumber === 1">
+                        <a class="page-link" routerLink="" [queryParams]="{ page: pageDetails.pageNumber - 1 }" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+
+                    @for (details of generatePages(); track users.length) {
+                        <li class="page-item" [class.disabled]="pageDetails.pageNumber === details.value">
+                            <a class="page-link" routerLink="" [queryParams]="{ page: details.value }">{{ details.page }}</a>
+                        </li>
+                    }
+
+                    <li class="page-item" [class.disabled]="pageDetails.pageNumber === pageDetails.max">
+                        <a class="page-link" routerLink="" [queryParams]="{ page: pageDetails.pageNumber + 1 }" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="col-2"></div>
+
+                <div class="col-2 form-group">
+                    <select [(ngModel)]="pageDetails.size" (ngModelChange)="changePageSize()" class="form-control" name="page-sizes" id="page-size-select">
+                        <option value="3">3 users per page</option>
+                        <option value="5">5 users per page</option>
+                        <option value="10">10 users per page</option>
+                    </select>
+                </div>
+            </div>
+        }
     </div>
 </section>

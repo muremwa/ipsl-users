@@ -4,12 +4,17 @@ import { User } from "../../services/users.model";
 import { environment } from "../../../environments/environment";
 import { NgOptimizedImage } from "@angular/common";
 import { ToastrService } from "ngx-toastr";
+import { ActivatedRoute, Router, RouterLink } from "@angular/router";
+import { FormsModule } from "@angular/forms";
+import { skip } from "rxjs";
 
 @Component({
     selector: 'app-user-list',
     standalone: true,
     imports: [
         NgOptimizedImage,
+        RouterLink,
+        FormsModule,
     ],
     templateUrl: './user-list.component.html',
     styleUrl: './user-list.component.scss'
@@ -17,11 +22,40 @@ import { ToastrService } from "ngx-toastr";
 export class UserListComponent implements OnInit {
     loadingDetails = { isFetching: false, isSaving: false };
     avatarUrl = environment.avatar;
+    pageDetails = { size: 3, pageNumber: 1, max: 1 };
     users: Array<User> = [];
+    totalItems = 0;
 
-    constructor(private service: UsersService, private toaster: ToastrService) {}
+    constructor(private service: UsersService, private toaster: ToastrService, private route: ActivatedRoute, private router: Router) {}
+
+    static checkItemIsDigit(item: string, fallback: number): number {
+        const convertedItem = parseInt(item);
+        return isNaN(convertedItem)? fallback: convertedItem;
+    }
 
     ngOnInit(): void {
+        this.route.queryParams.pipe(skip(1)).subscribe(
+            (data) => {
+                if (data.hasOwnProperty("page")) {
+                    this.pageDetails.pageNumber = UserListComponent.checkItemIsDigit(data["page"], 1);
+                    this.fetchUsers({});
+                }
+
+                if (data.hasOwnProperty("size")) {
+                    this.pageDetails.size = UserListComponent.checkItemIsDigit(data["size"], 3);
+                    this.pageDetails.max = Math.ceil(this.pageDetails.size / this.pageDetails.pageNumber);
+                    this.fetchUsers({});
+                }
+            }
+        );
+
+        const queryParams = this.route.snapshot.queryParams;
+        this.pageDetails = {
+            max: 1,
+            size: UserListComponent.checkItemIsDigit(queryParams['size'], 3),
+            pageNumber: UserListComponent.checkItemIsDigit(queryParams['page'], 1)
+        };
+        this.pageDetails.max = Math.ceil(this.pageDetails.size / this.pageDetails.pageNumber);
         this.fetchUsers({});
     }
 
@@ -31,12 +65,29 @@ export class UserListComponent implements OnInit {
         this.service.getAllUsers(filter).subscribe(
             (data) => {
                 if (data.success) {
-                    this.users = data.data;
+                    // hack to paginate
+                    this.totalItems = data.data.length;
+                    const end = this.pageDetails.size * this.pageDetails.pageNumber;
+                    const start = end - this.pageDetails.size;
+                    this.users = data.data.slice(start, end);
                 } else {
                     this.toaster.error(`Could not load users: ${data.message}`);
                 }
                 this.loadingDetails.isFetching = false;
             }
         );
+    }
+
+    generatePages() {
+        const pages = Math.ceil(this.totalItems / this.pageDetails.size);
+        this.pageDetails.max = pages;
+        return Array.from(Array(pages), (_, i) => ({ page: i + 1, value: i + 1 }));
+    }
+
+    changePageSize() {
+        this.router.navigate([], {
+            queryParams: { page: 1, size: this.pageDetails.size },
+            queryParamsHandling: 'merge'
+        }).then((_) => void 0);
     }
 }
