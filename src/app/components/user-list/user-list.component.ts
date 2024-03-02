@@ -70,7 +70,7 @@ export class UserListComponent implements OnInit {
         this.processInitialParams(this.route.snapshot.queryParams);
 
         // subsequent query params
-        this.route.queryParams.pipe(skip(1)).subscribe(this.processSubsequentParams);
+        this.route.queryParams.pipe(skip(1)).subscribe(this.processSubsequentParams.bind(this));
     }
 
     processInitialParams(params: Params) {
