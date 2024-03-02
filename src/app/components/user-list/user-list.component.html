@@ -27,7 +27,7 @@
                     } @else {
                         @if (users.length > 0) {
                             @for (user of users; track user.id) {
-                                <tr>
+                                <tr class="user-item" [companyHighlight]="user.company.name">
                                     <td class="text-center">
                                         <img class="user-avatar" [ngSrc]="avatarUrl" alt="User avatar" width="100" height="100">
                                     </td>

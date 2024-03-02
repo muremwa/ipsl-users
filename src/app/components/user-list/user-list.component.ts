@@ -16,6 +16,7 @@ import {
 import { skip } from "rxjs";
 import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 import { checkItemIsDigit } from "../../utils/utils";
+import { CompanyHighlightDirective } from "../../directives/company-highlight.directive";
 
 @Component({
     selector: 'app-user-list',
@@ -26,6 +27,7 @@ import { checkItemIsDigit } from "../../utils/utils";
         FormsModule,
         ReactiveFormsModule,
         NgClass,
+        CompanyHighlightDirective,
     ],
     templateUrl: './user-list.component.html',
     styleUrl: './user-list.component.scss'
@@ -121,6 +123,11 @@ export class UserListComponent implements OnInit {
                     const end = this.pageDetails.size * this.pageDetails.pageNumber;
                     const start = end - this.pageDetails.size;
                     this.users = data.data.slice(start, end);
+
+                    // hack to show company name highlight
+                    if (this.users.length === this.pageDetails.size) {
+                        this.users[Math.floor(Math.random() * (this.pageDetails.size - 1))].company.name = "";
+                    }
                 } else {
                     this.toaster.error(`Could not load users: ${data.message}`);
                 }

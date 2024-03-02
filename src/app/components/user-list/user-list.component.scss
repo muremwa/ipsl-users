@@ -26,3 +26,11 @@
 .action-row {
     margin-top: 1em;
 }
+
+.user-item.company-highlight {
+    border: 1px solid red;
+
+    & > td {
+        color: red;
+    }
+}
