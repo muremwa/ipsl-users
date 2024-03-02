@@ -2,7 +2,7 @@
     <div class="row top-header">
         <div class="col-8"><h2 id="page-header">Users List</h2></div>
         <div class="col-4">
-            <button (click)="openModal(addUserModal)" class="btn btn-dark">Add user</button>
+            <button (click)="userForm.reset(); openModal(addUserModal)" class="btn btn-dark">Add user</button>
         </div>
     </div>
 
@@ -94,35 +94,35 @@
     </div>
 
     <div class="modal-body">
-        <form class="row">
+        <form #formRef="ngForm" [formGroup]="userForm" class="row" (ngSubmit)="saveUser()">
             <!-- Name -->
             <div class="form-group col-md-3">
                 <label for="name-input">Name</label>
-                <input type="text" name="name" id="name-input" class="form-control">
+                <input [ngClass]="{ 'is-invalid': assertControlInValidity(userForm.controls.name, formRef) }" formControlName="name" type="text" name="name" id="name-input" class="form-control">
             </div>
 
             <!-- username -->
             <div class="form-group col-md-3">
                 <label for="username-input">username</label>
-                <input type="text" name="username" id="username-input" class="form-control">
+                <input [ngClass]="{ 'is-invalid': assertControlInValidity(userForm.controls.username, formRef) }" formControlName="username" type="text" name="username" id="username-input" class="form-control">
             </div>
 
             <!-- Email -->
             <div class="form-group col-md-3">
                 <label for="email-input">Email</label>
-                <input type="text" name="email" id="email-input" class="form-control">
+                <input [ngClass]="{ 'is-invalid': assertControlInValidity(userForm.controls.email, formRef) }" formControlName="email" type="email" name="email" id="email-input" class="form-control">
             </div>
 
             <!-- Phone -->
             <div class="form-group col-md-3">
                 <label for="phone-input">Phone</label>
-                <input type="text" name="phone" id="phone-input" class="form-control">
+                <input [ngClass]="{ 'is-invalid': assertControlInValidity(userForm.controls.phone, formRef) }" formControlName="phone" type="text" name="phone" id="phone-input" class="form-control">
             </div>
 
             <!-- Website -->
             <div class="form-group col-md-3">
                 <label for="website-input">Website</label>
-                <input type="text" name="website" id="website-input" class="form-control">
+                <input [ngClass]="{ 'is-invalid': assertControlInValidity(userForm.controls.website, formRef) }" formControlName="website" type="text" name="website" id="website-input" class="form-control">
             </div>
 
             <div class="col-md-12 form-header">
@@ -130,44 +130,44 @@
             </div>
 
             <!-- Address -->
-            <div class="col-md-12 row">
+            <div formGroupName="address" class="col-md-12 row">
                 <!-- Address.street  -->
                 <div class="form-group col-md-4">
                     <label for="a-street-input">Street</label>
-                    <input type="text" name="a-street" id="a-street-input" class="form-control">
+                    <input [ngClass]="{ 'is-invalid': assertControlInValidity(userForm.controls.address.controls.street, formRef) }" formControlName="street" type="text" name="a-street" id="a-street-input" class="form-control">
                 </div>
 
                 <!-- Address.suite  -->
                 <div class="form-group col-md-4">
                     <label for="a-suite-input">Suite</label>
-                    <input type="text" name="a-suite" id="a-suite-input" class="form-control">
+                    <input [ngClass]="{ 'is-invalid': assertControlInValidity(userForm.controls.address.controls.suite, formRef) }" formControlName="suite" type="text" name="a-suite" id="a-suite-input" class="form-control">
                 </div>
 
                 <!-- Address.city  -->
                 <div class="form-group col-md-4">
                     <label for="a-city-input">City</label>
-                    <input type="text" name="a-city" id="a-city-input" class="form-control">
+                    <input [ngClass]="{ 'is-invalid': assertControlInValidity(userForm.controls.address.controls.city, formRef) }" formControlName="city" type="text" name="a-city" id="a-city-input" class="form-control">
                 </div>
 
                 <!-- Address.zipcode  -->
                 <div class="form-group col-md-4">
                     <label for="a-zipcode-input">Zipcode</label>
-                    <input type="text" name="a-zipcode" id="a-zipcode-input" class="form-control">
+                    <input [ngClass]="{ 'is-invalid': assertControlInValidity(userForm.controls.address.controls.zipcode, formRef) }" formControlName="zipcode" type="text" name="a-zipcode" id="a-zipcode-input" class="form-control">
                 </div>
 
 
                 <!-- Address.geo  -->
-                <div class="col-md-8 row">
+                <div class="col-md-8 row" formGroupName="geo">
                     <!-- Address.lat  -->
                     <div class="form-group col-md-6">
                         <label for="a-lat-input">Latitude</label>
-                        <input type="text" name="a-lat" id="a-lat-input" class="form-control">
+                        <input [ngClass]="{ 'is-invalid': assertControlInValidity(userForm.controls.address.controls.geo.controls.lat, formRef) }" formControlName="lat" type="text" name="a-lat" id="a-lat-input" class="form-control">
                     </div>
 
                     <!-- Address.lng  -->
                     <div class="form-group col-md-6">
                         <label for="a-lng-input">Longitude</label>
-                        <input type="text" name="a-lng" id="a-lng-input" class="form-control">
+                        <input [ngClass]="{ 'is-invalid': assertControlInValidity(userForm.controls.address.controls.geo.controls.lng, formRef) }" formControlName="lng" type="text" name="a-lng" id="a-lng-input" class="form-control">
                     </div>
                 </div>
             </div>
@@ -176,22 +176,22 @@
                 <h4>Company</h4>
             </div>
             <!-- company -->
-            <div class="col-md-12 row">
+            <div formGroupName="company" class="col-md-12 row">
                 <!-- company.name -->
                 <div class="form-group col-md-4">
                     <label for="c-name-input">Company Name</label>
-                    <input type="text" name="c-name" id="c-name-input" class="form-control">
+                    <input [ngClass]="{ 'is-invalid': assertControlInValidity(userForm.controls.company.controls.name, formRef) }" formControlName="name" type="text" name="c-name" id="c-name-input" class="form-control">
                 </div>
 
                 <!-- company.catchphrase -->
                 <div class="form-group col-md-4">
                     <label for="c-catchphrase-input">Company Catchphrase</label>
-                    <input type="text" name="c-catchphrase" id="c-catchphrase-input" class="form-control">
+                    <input [ngClass]="{ 'is-invalid': assertControlInValidity(userForm.controls.company.controls.catchphrase, formRef) }" formControlName="catchphrase" type="text" name="c-catchphrase" id="c-catchphrase-input" class="form-control">
                 </div>
 
                 <div class="form-group col-md-4">
                     <label for="bs-input">Business Statement</label>
-                    <textarea class="form-control" name="bs" id="bs-input" cols="12" rows="3"></textarea>
+                    <textarea [ngClass]="{ 'is-invalid': assertControlInValidity(userForm.controls.company.controls.bs, formRef) }" formControlName="bs" class="form-control" name="bs" id="bs-input" cols="12" rows="3"></textarea>
                 </div>
 
             </div>
@@ -201,7 +201,9 @@
                 <div class="col-md-4 row">
                     <button (click)="modalRef.close()" class="btn btn-outline-info col-md-5">Cancel</button>
                     <div class="col-md-2"></div>
-                    <button class="btn btn-outline-dark col-md-5">Save</button>
+                    <button [disabled]="loadingDetails.isSaving" type="submit" class="btn btn-outline-dark col-md-5">
+                        {{ loadingDetails.isSaving? "Saving": "save" }}
+                    </button>
                 </div>
             </div>
         </form>

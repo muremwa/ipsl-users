@@ -2,10 +2,17 @@ import { Component, OnInit, TemplateRef } from '@angular/core';
 import { UsersService } from "../../services/users.service";
 import { User } from "../../services/users.model";
 import { environment } from "../../../environments/environment";
-import { NgOptimizedImage } from "@angular/common";
+import { NgClass, NgOptimizedImage } from "@angular/common";
 import { ToastrService } from "ngx-toastr";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
-import { FormsModule } from "@angular/forms";
+import {
+    FormControl,
+    FormGroup,
+    FormGroupDirective,
+    FormsModule,
+    ReactiveFormsModule,
+    Validators
+} from "@angular/forms";
 import { skip } from "rxjs";
 import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 
@@ -16,6 +23,8 @@ import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
         NgOptimizedImage,
         RouterLink,
         FormsModule,
+        ReactiveFormsModule,
+        NgClass,
     ],
     templateUrl: './user-list.component.html',
     styleUrl: './user-list.component.scss'
@@ -28,6 +37,28 @@ export class UserListComponent implements OnInit {
     totalItems = 0;
     searchParams: { [key: string]: string } = {};
     modalRef: NgbModalRef;
+    userForm = new FormGroup({
+        name: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+        username: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+        email: new FormControl("", { nonNullable: true, validators: [Validators.required, Validators.email] }),
+        phone: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+        website: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+        address: new FormGroup({
+            street: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+            suite: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+            city: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+            zipcode: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+            geo: new FormGroup({
+                lat: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+                lng: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+            })
+        }),
+        company: new FormGroup({
+            name: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+            catchphrase: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+            bs: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+        })
+    });
 
     constructor(private service: UsersService, private toaster: ToastrService, private route: ActivatedRoute, private router: Router, private modalService: NgbModal) {}
 
@@ -117,5 +148,30 @@ export class UserListComponent implements OnInit {
 
     openModal(ref: TemplateRef<void>) {
         this.modalRef = this.modalService.open(ref, { size: "xl" });
+    }
+
+    assertControlInValidity(control: FormControl, form: FormGroupDirective): boolean {
+        return (control.dirty && control.invalid) || (form.submitted && control.invalid);
+    }
+
+    saveUser() {
+        if (this.userForm.valid) {
+            this.loadingDetails.isSaving = true;
+            this.service.addUser(this.userForm.value).subscribe(
+                (data) => {
+                    if (data.success) {
+                        this.users.pop();
+                        this.users.unshift(data.data);
+                        this.toaster.success(`Added user: ${data.data.username}`);
+                        this.modalRef.close();
+                    } else {
+                        this.toaster.error(`Could not save user: ${data.message}`);
+                    }
+                    this.loadingDetails.isSaving = false;
+                }
+            );
+        } else {
+            this.toaster.error("Form details are not valid");
+        }
     }
 }
