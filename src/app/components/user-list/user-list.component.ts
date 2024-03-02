@@ -15,6 +15,7 @@ import {
 } from "@angular/forms";
 import { skip } from "rxjs";
 import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
+import { checkItemIsDigit } from "../../utils/utils";
 
 @Component({
     selector: 'app-user-list',
@@ -55,17 +56,12 @@ export class UserListComponent implements OnInit {
         }),
         company: new FormGroup({
             name: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
-            catchphrase: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+            catchPhrase: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
             bs: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
         })
     });
 
     constructor(private service: UsersService, private toaster: ToastrService, private route: ActivatedRoute, private router: Router, private modalService: NgbModal) {}
-
-    static checkItemIsDigit(item: string, fallback: number): number {
-        const convertedItem = parseInt(item);
-        return isNaN(convertedItem)? fallback: convertedItem;
-    }
 
     ngOnInit(): void {
         // initial page load
@@ -75,8 +71,8 @@ export class UserListComponent implements OnInit {
         }
         this.pageDetails = {
             max: 1,
-            size: UserListComponent.checkItemIsDigit(queryParams['size'], 3),
-            pageNumber: UserListComponent.checkItemIsDigit(queryParams['page'], 1)
+            size: checkItemIsDigit(queryParams['size'], 3),
+            pageNumber: checkItemIsDigit(queryParams['page'], 1)
         };
         this.pageDetails.max = Math.ceil(this.pageDetails.size / this.pageDetails.pageNumber);
         this.fetchUsers(this.searchParams);
@@ -91,11 +87,11 @@ export class UserListComponent implements OnInit {
                 }
 
                 if (data.hasOwnProperty("page")) {
-                    this.pageDetails.pageNumber = UserListComponent.checkItemIsDigit(data["page"], 1);
+                    this.pageDetails.pageNumber = checkItemIsDigit(data["page"], 1);
                 }
 
                 if (data.hasOwnProperty("size")) {
-                    this.pageDetails.size = UserListComponent.checkItemIsDigit(data["size"], 3);
+                    this.pageDetails.size = checkItemIsDigit(data["size"], 3);
                     this.pageDetails.max = Math.ceil(this.pageDetails.size / this.pageDetails.pageNumber);
                 }
                 this.fetchUsers(this.searchParams);

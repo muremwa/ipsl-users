@@ -1,6 +1,6 @@
 interface Company {
     name: string;
-    catchphrase: string;
+    catchPhrase: string;
     bs: string;
 }
 
