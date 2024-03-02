@@ -19,8 +19,10 @@ export class UserDetailComponent implements OnInit {
     constructor(private route: ActivatedRoute, private toaster: ToastrService, private service: UsersService) {}
 
     ngOnInit(): void {
-        const userID = checkItemIsDigit(this.route.snapshot.paramMap.get("userID")!, -1);
+        this.getUser(checkItemIsDigit(this.route.snapshot.paramMap.get("userID")!, -1));
+    }
 
+    getUser(userID: number) {
         if (userID > -1) {
             this.isFetchingUser = true;
             this.service.getUser(userID).subscribe(

@@ -12,7 +12,7 @@ export class UsersService {
     constructor(private client: HttpClient) {}
 
     static errorHandler<T>(error: unknown): T {
-        const response = { success: false, message: "An error occurred", data: [] };
+        const response = { success: false, message: "An error occurred", data: null };
         if (error instanceof HttpErrorResponse) {
             response["message"] = error.statusText;
         }
@@ -37,20 +37,6 @@ export class UsersService {
         return this.client.get<User>(`${environment.url}/${userID}`).pipe(
             map((data) => ({ message: "Success", success: true, data })),
             catchError((err) => of(UsersService.errorHandler<ApiResponse<User>>(err)))
-        );
-    }
-
-    updateUser(userID: number, data: object): Observable<ApiResponse<User>> {
-        return this.client.put<User>(`${environment.url}/${userID}`, data).pipe(
-            map((data) => ({ message: "Success", success: true, data })),
-            catchError((err) => of(UsersService.errorHandler<ApiResponse<User>>(err)))
-        );
-    }
-
-    deleteUser(userID: number): Observable<ApiResponse<null>> {
-        return this.client.delete(`${environment.url}/${userID}`).pipe(
-            map(() => ({ message: "Success", success: true, data: null })),
-            catchError((err) => of(UsersService.errorHandler<ApiResponse<null>>(err)))
         );
     }
 }

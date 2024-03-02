@@ -4,7 +4,7 @@ import { User } from "../../services/users.model";
 import { environment } from "../../../environments/environment";
 import { NgClass, NgOptimizedImage } from "@angular/common";
 import { ToastrService } from "ngx-toastr";
-import { ActivatedRoute, Router, RouterLink } from "@angular/router";
+import { ActivatedRoute, Params, Router, RouterLink } from "@angular/router";
 import {
     FormControl,
     FormGroup,
@@ -67,38 +67,41 @@ export class UserListComponent implements OnInit {
 
     ngOnInit(): void {
         // initial page load
-        const queryParams = this.route.snapshot.queryParams;
-        if (queryParams.hasOwnProperty('search')) {
-            this.searchParams = this.generateSearchParams(queryParams['search']);
+        this.processInitialParams(this.route.snapshot.queryParams);
+
+        // subsequent query params
+        this.route.queryParams.pipe(skip(1)).subscribe(this.processSubsequentParams);
+    }
+
+    processInitialParams(params: Params) {
+        if (params.hasOwnProperty('search')) {
+            this.searchParams = this.generateSearchParams(params['search']);
         }
         this.pageDetails = {
             max: 1,
-            size: checkItemIsDigit(queryParams['size'], 3),
-            pageNumber: checkItemIsDigit(queryParams['page'], 1)
+            size: checkItemIsDigit(params['size'], 3),
+            pageNumber: checkItemIsDigit(params['page'], 1)
         };
-        this.pageDetails.max = Math.ceil(this.pageDetails.size / this.pageDetails.pageNumber);
+        this.pageDetails.max = Math.ceil(this.totalItems / this.pageDetails.size);
         this.fetchUsers(this.searchParams);
+    }
 
-        this.route.queryParams.pipe(skip(1)).subscribe(
-            (data) => {
-                // subsequent query params
-                if (data.hasOwnProperty("search")) {
-                    this.searchParams = this.generateSearchParams(data["search"]);
-                } else {
-                    this.searchParams = {};
-                }
+    processSubsequentParams(params: Params) {
+        if (params.hasOwnProperty("search")) {
+            this.searchParams = this.generateSearchParams(params["search"]);
+        } else {
+            this.searchParams = {};
+        }
 
-                if (data.hasOwnProperty("page")) {
-                    this.pageDetails.pageNumber = checkItemIsDigit(data["page"], 1);
-                }
+        if (params.hasOwnProperty("page")) {
+            this.pageDetails.pageNumber = checkItemIsDigit(params["page"], 1);
+        }
 
-                if (data.hasOwnProperty("size")) {
-                    this.pageDetails.size = checkItemIsDigit(data["size"], 3);
-                    this.pageDetails.max = Math.ceil(this.pageDetails.size / this.pageDetails.pageNumber);
-                }
-                this.fetchUsers(this.searchParams);
-            }
-        );
+        if (params.hasOwnProperty("size")) {
+            this.pageDetails.size = checkItemIsDigit(params["size"], 3);
+            this.pageDetails.max = Math.ceil(this.totalItems / this.pageDetails.size);
+        }
+        this.fetchUsers(this.searchParams);
     }
 
     generateSearchParams(item: string): { [key: string]: string } {

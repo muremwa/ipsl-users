@@ -18,11 +18,11 @@ export class AppComponent implements OnInit {
     constructor(public router: Router) {}
 
     ngOnInit(): void {
-        this.router.events.subscribe(
-            (_) => {
-                this.isNavCollapsed = true;
-            }
-        );
+        this.router.events.subscribe(this.collapseNav);
+    }
+
+    collapseNav(_: unknown) {
+        this.isNavCollapsed = true;
     }
 
     searchItem() {
